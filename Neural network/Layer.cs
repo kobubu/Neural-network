@@ -10,7 +10,9 @@ namespace Neural_network
         //слой - это набор нейронов
         public List<Neuron> Neurons { get; }
         //свойство, которое позволяет вычислить количство нейронов, в коде встроена проверка на null
-        public int Count => Neurons?.Count ?? 0;//каунт. такой что если neurons = null? то count = null.
+        public int NeuronCount => Neurons?.Count ?? 0;//каунт. такой что если neurons = null? то count = null.
+
+        public NeuronType Type;
 
         //делаем контсруктор, внутри одного слоя будет список нейронов, котороые нужно првоерить на корректность и так же тип - т.к. на одном слое могут быть нейроны только одного типа
         public Layer(List<Neuron> neurons, NeuronType type = NeuronType.Normal)
@@ -31,7 +33,14 @@ namespace Neural_network
             }
             return result;
         }
-        
+
+        //для слоя переопределяем функцию toString, чтобы она возвращала тип, ибо оно нечитаемое
+
+        public override string ToString()
+        {
+            //возвращаем тип, чтобы было читаемее при отладке
+            return Type.ToString();
+        }
 
     }
 }

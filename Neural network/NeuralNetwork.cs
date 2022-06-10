@@ -9,7 +9,12 @@ namespace Neural_network
     //нейронняа сеть представляет собой коллекцию слоев
     public class NeuralNetwork
     {
-    
+
+        static public void Main(String[] args)
+        {
+
+         
+        }
         public Topology Topology { get; }
         public List<Layer> Layers { get; }
 
@@ -29,7 +34,7 @@ namespace Neural_network
         //метод, который будет принимать какие-то параметры и осуществлять прогон по нейросети, но не для отдельного нейрона, а всей большой нейросети
         //на вход получает какое-то количество входных сигналов и отправляет на входной уровень
         //при этом количество входных сигналов должно соответствовать колиеству нейронов на сети
-        public Neuron FeedForward(List<double> inputSignals)
+        public Neuron FeedForward(params double[] inputSignals)
         {
 
             //c помощью этого отправляем данные на наши входные нейроны
@@ -49,6 +54,66 @@ namespace Neural_network
             }
         }
 
+        //метод, принимающий коллекцию для обучения
+        public double Learn(List<Tuple<double, double[]>> dataset, int epoch) //dataset - то, на чем мы обучаем, epoch - количество прогонов всего обучающего датасета
+        {
+            var error = 0.0;
+            for(int i = 0; i < epoch; i++)
+            {
+                //берем 1 набор данных и отправляем на обучение
+                foreach(var data in dataset)
+                {
+                    //метод Backpropagation возвращает нам нашу ошибку, соответственно мы будем эту ошибку подсчитывать
+                    error += Backpropagation(data.Item1, data.Item2);
+                }
+                //прошли необходимое количство эпох и в result возвращаем среднюю ошибку
+            }
+            var result = error/epoch;
+            return result;
+        }
+        //добавляем метод обратного распространения ошибки
+        //передаем ожидаемый результат и входные сигналы
+        private double Backpropagation(double expected, params double[] inputs)
+        {
+            var actual = FeedForward(inputs).Output;
+
+            //вычислили результат
+            var difference = actual-expected;
+            //запустили балансировку
+            foreach(var neuron in Layers.Last().Neurons)
+            {
+                //обучаем нейрон
+                neuron.Learn(difference, Topology.LearningRate);
+            }    
+
+            //после этого движемся по слоям
+            for(int j = Layers.Count -2; j >= 0; j--)
+            {
+                var layer = Layers[j];
+                //уже обученный слой справа 
+                var previousLayer = Layers[j+1];
+                //начинаем обучать послойно
+
+                for (int i = 0; i < layer.NeuronCount; i++)
+                {
+
+                    var neuron = layer.Neurons[i];
+                    for (int k = 0; k < previousLayer.NeuronCount; k++)
+                    {
+                        var previousNeuron = previousLayer.Neurons[k];
+                        //формула вычисления ошибки, подходящая для всех нейронов, кроме крайнего справа слоя
+                        var error = previousNeuron.Weights[i] * previousNeuron.Delta;//весов несколько, поэтому нужен вес, относящийся к текущему нейрону [i]
+                        //и теперь выполняем обучение нейрона на значение этой ошибки
+                        neuron.Learn(error, Topology.LearningRate);
+                    }
+
+                }
+            }
+            //осталось вернуть разницу, а возвращают обычно квадратическую ошибку, поэтому мы также вернем
+            var result = difference*difference;
+            return result;
+        }
+
         private void FeedForwardAllLayersAfterInput()
         {
             for (int i = 1; i < Layers.Count;)
@@ -66,9 +131,9 @@ namespace Neural_network
             }
         }
 
-        private void SendSignalsToInputNeurons(List<double> inputSignals)
+        private void SendSignalsToInputNeurons(params double[] inputSignals)
         {
-            for (int i = 0; i < inputSignals.Count; i++)
+            for (int i = 0; i < inputSignals.Length; i++)
             {
                 var signal = new List<double> { inputSignals[i] };
 
@@ -88,7 +153,7 @@ namespace Neural_network
             var lastLayer = Layers.Last(); 
             for (int i = 0; i < Topology.OutputCount; i++)
             { //здесь нужно знать, какое количество нейронов на предыдущем слое 
-                var neuron = new Neuron(lastLayer.Count, NeuronType.Output);
+                var neuron = new Neuron(lastLayer.NeuronCount, NeuronType.Output);
                 outputNeurons.Add(neuron);
             }
             var outputLayer = new Layer(outputNeurons, NeuronType.Output);
@@ -107,7 +172,7 @@ namespace Neural_network
                 var lastLayer = Layers.Last();
                 for (int i = 0; i < Topology.HiddenLayers[j]; i++)
             { //здесь нужно знать, какое количество нейронов на предыдущем слое 
-                var neuron = new Neuron(lastLayer.Count);
+                var neuron = new Neuron(lastLayer.NeuronCount);
                 hiddenNeurons.Add(neuron);
             }
             var hiddenLayer = new Layer(hiddenNeurons, NeuronType.Output);

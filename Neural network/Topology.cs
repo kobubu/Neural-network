@@ -15,15 +15,17 @@ namespace Neural_network
         //количество выходов
         public int OutputCount { get; }
 
+        public double LearningRate { get; }
         //по середине скрытые слои и количество нейронов в них может отличаться
         //коллекция, в которой на каждом слое хранится количство нейронов на этом слое  
         public List<int> HiddenLayers { get; }
 
         //params - для задания количества нейронов для каждого слоя  
-        public Topology(int inputCount, int outputCount, params int[] layers)
+        public Topology(int inputCount, int outputCount, double learningRate, params int[] layers)
         {
             InputCount = inputCount;
             OutputCount = outputCount;
+            LearningRate = learningRate;
             //прокидываем наш массив
             HiddenLayers = new List<int>();
             HiddenLayers.AddRange(layers);
