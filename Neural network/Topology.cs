@@ -16,7 +16,7 @@ namespace Neural_network
         public int OutputCount { get; }
 
         public double LearningRate { get; }
-        //по середине скрытые слои и количество нейронов в них может отличаться
+        //посередине скрытые слои и количество нейронов в них может отличаться
         //коллекция, в которой на каждом слое хранится количство нейронов на этом слое  
         public List<int> HiddenLayers { get; }
 

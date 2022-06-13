@@ -31,12 +31,12 @@ namespace Neural_network
             //инициализировали к-во входных сигналов
             Inputs = new List<double>();
 
-            InitWeightsRandomValues(inputСount);
+            InitWeightsRandomValue(inputСount);
 
             //метод который выполняет вычисление всех входящих параметро наховем его feedforward  - это линейное распространение слева направо, рекурентные сети, это те, которые ходят внутри себя много раз
         }
 
-        private void InitWeightsRandomValues(int inputСount)
+        private void InitWeightsRandomValue(int inputСount)
         {
             var rnd = new Random();
             for (int i = 0; i < inputСount; i++)
@@ -70,7 +70,7 @@ namespace Neural_network
             var sum = 0.0;
             for (int i = 0; i < inputs.Count; i++)
             {
-                sum += inputs[i]*Weights[i];
+                sum += inputs[i] * Weights[i];
             }
 
             //здесь проверка на то, что если это не импутный нейрон, то сигмойдная функция не применяется
@@ -88,7 +88,7 @@ namespace Neural_network
 
         private double Sigmoid(double x)
         {
-            var result = 1.0 / (1.0 + Math.Exp(-x));
+            var result = 1.0 / (1.0 + Math.Pow(Math.E, -x));  //1.0 / (1.0 + Math.Exp(-x));
             return result;
         }
 
@@ -97,7 +97,7 @@ namespace Neural_network
         private double SigmoidDx(double x)
         {
             var sigmoid = Sigmoid(x);
-            var result = sigmoid/(1-sigmoid);
+            var result = sigmoid / (1 - sigmoid);
             return result;
         }
 
@@ -131,9 +131,7 @@ namespace Neural_network
                 var newWeight = weight - input * Delta * learningRate;
                 //теперь остается присвоить вес
                 Weights[i] = newWeight;
-            }
-            
-            
+            }   
         }
     }
 }
