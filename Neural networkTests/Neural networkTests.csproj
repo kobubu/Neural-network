@@ -57,6 +57,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="NeuralNetworkTests.cs" />
+    <Compile Include="PictureConverterTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -67,6 +68,12 @@
       <Project>{3C62FC1A-3994-4534-A686-7015C140BD5D}</Project>
       <Name>Neural network</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <Content Include="Images\Parasitized2.png" />
+    <Content Include="Images\Unparasitized.png" />
+    <Content Include="Images\Parasitized.png" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
