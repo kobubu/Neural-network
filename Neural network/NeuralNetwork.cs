@@ -34,7 +34,7 @@ namespace Neural_network
         //метод, который будет принимать какие-то параметры и осуществлять прогон по нейросети, но не для отдельного нейрона, а всей большой нейросети
         //на вход получает какое-то количество входных сигналов и отправляет на входной уровень
         //при этом количество входных сигналов должно соответствовать колиеству нейронов на сети
-        public Neuron FeedForward(params double[] inputSignals)
+        public Neuron Predict(params double[] inputSignals)
         {
 
             //c помощью этого отправляем данные на наши входные нейроны
@@ -55,27 +55,29 @@ namespace Neural_network
         }
 
         //метод, принимающий коллекцию для обучения
-        public double Learn(List<Tuple<double, double[]>> dataset, int epoch) //dataset - то, на чем мы обучаем, epoch - количество прогонов всего обучающего датасета
+        public double Learn(double[] expected, double[,] inputs, int epoch)//dataset - то, на чем мы обучаем, epoch - количество прогонов всего обучающего датасета
         {
             var error = 0.0;
-            for(int i = 0; i < epoch; i++)
+            for (int i = 0; i < epoch; i++)
             {
                 //берем 1 набор данных и отправляем на обучение
-                foreach(var data in dataset)
+                for (int j = 0; j < expected.Length; j++)
                 {
+                    var output = expected[j];
+                    var input = GetRow(inputs, j);
                     //метод Backpropagation возвращает нам нашу ошибку, соответственно мы будем эту ошибку подсчитывать
-                    error += Backpropagation(data.Item1, data.Item2);
+                    error += Backpropagation(output, input);
                 }
                 //прошли необходимое количство эпох и в result возвращаем среднюю ошибку
             }
-            var result = error/epoch;
+            var result = error / epoch;
             return result;
         }
         //добавляем метод обратного распространения ошибки
         //передаем ожидаемый результат и входные сигналы
         private double Backpropagation(double expected, params double[] inputs)
         {
-            var actual = FeedForward(inputs).Output;
+            var actual = Predict(inputs).Output;
 
             //вычислили результат
             var difference = actual-expected;
@@ -194,6 +196,16 @@ namespace Neural_network
             var inputLayer = new Layer(inputNeurons, NeuronType.Input);
             //добавляем в качестве первого словя в нашу коллекцию слоев
             Layers.Add(inputLayer); 
+        }
+
+
+        public static double[] GetRow(double[,] matrix, int row)
+        {
+            var columns = matrix.GetLength(1);
+            var array = new double[columns];
+            for (int i = 0; i < columns; ++i)
+                array[i] = matrix[row, i];
+            return array;
         }
     }
 }
